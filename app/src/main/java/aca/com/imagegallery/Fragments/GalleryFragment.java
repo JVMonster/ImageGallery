@@ -37,12 +37,12 @@ public class GalleryFragment extends Fragment {
 
     private GalleryAdapter mAdapter;
     private RecyclerView mRecyclerView;
-    ArrayList<ImageModel> data = new ArrayList<>();
+    public ArrayList<ImageModel> data = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getAllShownImagesPath(getActivity());
+        //getAllShownImagesPath(getActivity());
 
 
     }
@@ -75,7 +75,9 @@ public class GalleryFragment extends Fragment {
         return view;
     }
 
-
+    public void setImagesPath(ArrayList<ImageModel> path){
+        data=path;
+    }
 
     private void getAllShownImagesPath(Activity activity) {
         Uri uri;

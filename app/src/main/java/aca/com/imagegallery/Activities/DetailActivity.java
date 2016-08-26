@@ -1,5 +1,7 @@
 package aca.com.imagegallery.Activities;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 
 /**
@@ -12,17 +14,23 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 
+import com.adobe.creativesdk.aviary.AdobeImageIntent;
+import com.adobe.creativesdk.aviary.internal.filters.ToolLoaderFactory;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.games.leaderboard.LeaderboardEntity;
 
 import java.util.ArrayList;
 
+import aca.com.imagegallery.Application.EditorApplication;
 import aca.com.imagegallery.Models.ImageModel;
 
 import aca.com.imagegallery.R;
@@ -31,29 +39,32 @@ import aca.com.imagegallery.Urils.DepthPageTransformer;
 public class DetailActivity extends AppCompatActivity {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private ViewPager mViewPager;
 
     public ArrayList<ImageModel> data = new ArrayList<>();
     int pos;
+    Uri mImageUri;
+    public static final int EDITOR_REQUEST=1;
 
     Toolbar toolbar;
+    Button mEditBtn,mShowBtn;
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        init();
 
 //        toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
 //        setSupportActionBar(toolbar);
 
         data = getIntent().getParcelableArrayListExtra("data");
         pos = getIntent().getIntExtra("pos", 0);
-
+        mImageUri=Uri.parse("file://"+data.get(pos).getUrl());
         setTitle(data.get(pos).getName());
+
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -85,9 +96,33 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
+        mShowBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToolLoaderFactory.Tools toolses[]={ToolLoaderFactory.Tools.COLOR,ToolLoaderFactory.Tools.DRAW,ToolLoaderFactory.Tools.EFFECTS,
+                        ToolLoaderFactory.Tools.BLEMISH,ToolLoaderFactory.Tools.ADJUST,ToolLoaderFactory.Tools.ENHANCE,ToolLoaderFactory.Tools.FOCUS,
+                        ToolLoaderFactory.Tools.LIGHTING,ToolLoaderFactory.Tools.BLUR,ToolLoaderFactory.Tools.MEME,ToolLoaderFactory.Tools.OVERLAYS,
+                        ToolLoaderFactory.Tools.ORIENTATION,ToolLoaderFactory.Tools.STICKERS,ToolLoaderFactory.Tools.TEXT,ToolLoaderFactory.Tools.SHARPNESS
 
+                };
+                Intent imageEditorintent=new AdobeImageIntent.Builder(getApplicationContext()).setData(mImageUri).withToolList(toolses).build();
+                startActivityForResult(imageEditorintent,2);
+            }
+        });
     }
 
+    private void init() {
+        mEditBtn=(Button) findViewById(R.id.editBtn);
+        mShowBtn=(Button) findViewById(R.id.showInMapBtn);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==EDITOR_REQUEST){
+            Log.d("XIAOMI","NKAR EDIT");
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
